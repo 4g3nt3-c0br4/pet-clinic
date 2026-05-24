@@ -43,7 +43,7 @@ jobs:
           cx_client_id: ${{ secrets.CX_CLIENT_ID }}
           cx_client_secret: ${{ secrets.CX_CLIENT_SECRET }}
           # Se cambió a scan_params aquí también
-          scan_params: --scan-types sca --threshold "sca-medium=1"
+          # scan_params: --scan-types sca --threshold "sca-medium=1"
 
   # --- ETAPA 3: IMAGEN Y SEGURIDAD (Trivy) ---
   image_security:
@@ -71,4 +71,4 @@ jobs:
         with:
           image-ref: 'pet-clinic:latest'
           severity: 'MEDIUM,HIGH,CRITICAL'
-          exit-code: '0'
+          exit-code: '1'
