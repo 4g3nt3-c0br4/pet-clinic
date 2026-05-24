@@ -63,6 +63,9 @@ jobs:
       - name: Compilar con Maven
         run: mvn clean package -DskipTests
 
+      - name: Preparar JAR para Docker
+        run: cp target/*.jar spring-petclinic-2.6.0.jar
+
       - name: Construir Imagen Docker
         run: docker build -t pet-clinic:latest .
 
