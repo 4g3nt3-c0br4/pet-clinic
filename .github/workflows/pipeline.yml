@@ -22,8 +22,8 @@ jobs:
           cx_tenant: ${{ secrets.CX_TENANT }}
           cx_client_id: ${{ secrets.CX_CLIENT_ID }}
           cx_client_secret: ${{ secrets.CX_CLIENT_SECRET }}
-          # Así se configura correctamente el bloqueo en la versión actual de CxOne:
-          additional_params: --scan-types sast --threshold "sast-medium=1"
+          # Se cambió a scan_params para cumplir con la versión actual del plugin
+          scan_params: --scan-types sast --threshold "sast-medium=1"
 
   # --- ETAPA 2: SCA (Checkmarx One Dependencias) ---
   sca_scan:
@@ -42,8 +42,8 @@ jobs:
           cx_tenant: ${{ secrets.CX_TENANT }}
           cx_client_id: ${{ secrets.CX_CLIENT_ID }}
           cx_client_secret: ${{ secrets.CX_CLIENT_SECRET }}
-          # El parámetro que exige el profe usando la sintaxis correcta:
-          additional_params: --scan-types sca --threshold "sca-medium=1"
+          # Se cambió a scan_params aquí también
+          scan_params: --scan-types sca --threshold "sca-medium=1"
 
   # --- ETAPA 3: IMAGEN Y SEGURIDAD (Trivy) ---
   image_security:
