@@ -17,17 +17,18 @@ jobs:
       - name: Análisis de Código CxOne
         uses: checkmarx/ast-github-action@main
         with:
-          project_name: "pet-clinic-sast"
+          project_name: "pet-clinic"
           base_uri: ${{ secrets.CX_BASE_URI }}
           cx_tenant: ${{ secrets.CX_TENANT }}
           cx_client_id: ${{ secrets.CX_CLIENT_ID }}
           cx_client_secret: ${{ secrets.CX_CLIENT_SECRET }}
-          severity_threshold: "MEDIUM" # Calidad: Falla si hay Media o superior
+          # Así se configura correctamente el bloqueo en la versión actual de CxOne:
+          additional_params: --scan-types sast --threshold "sast-medium=1"
 
   # --- ETAPA 2: SCA (Checkmarx One Dependencias) ---
   sca_scan:
     name: Escaneo SCA
-    needs: sast_scan # Modularidad: No ejecuta todo de una sola vez
+    needs: sast_scan
     runs-on: ubuntu-latest
     steps:
       - name: Checkout del código
@@ -36,17 +37,18 @@ jobs:
       - name: Análisis de Dependencias CxOne
         uses: checkmarx/ast-github-action@main
         with:
-          project_name: "pet-clinic-sca"
+          project_name: "pet-clinic"
           base_uri: ${{ secrets.CX_BASE_URI }}
           cx_tenant: ${{ secrets.CX_TENANT }}
           cx_client_id: ${{ secrets.CX_CLIENT_ID }}
           cx_client_secret: ${{ secrets.CX_CLIENT_SECRET }}
-          sca_threshold: "MEDIUM" # El 'with' que exige el profesor para terminar con errores
+          # El parámetro que exige el profe usando la sintaxis correcta:
+          additional_params: --scan-types sca --threshold "sca-medium=1"
 
   # --- ETAPA 3: IMAGEN Y SEGURIDAD (Trivy) ---
   image_security:
     name: Docker Build y Trivy
-    needs: sca_scan # Solo corre si la etapa anterior termina con éxito
+    needs: sca_scan
     runs-on: ubuntu-latest
     steps:
       - name: Checkout del código
@@ -58,7 +60,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # Compilar el .jar antes de compilar la imagen (Instrucción obligatoria de la clase)
       - name: Compilar con Maven
         run: mvn clean package -DskipTests
 
@@ -70,4 +71,4 @@ jobs:
         with:
           image-ref: 'pet-clinic:latest'
           severity: 'MEDIUM,HIGH,CRITICAL'
-          exit-code: '0' # Mantener en 0 temporalmente para ver el avance controlado
+          exit-code: '0'
